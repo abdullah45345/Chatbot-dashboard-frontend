@@ -25,7 +25,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadBusinesses = async () => {
       try {
-        const res = await fetch('http://localhost:8000/businesses');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses`);
         if (!res.ok) throw new Error('Failed to fetch businesses');
         const data = await res.json();
         setBusinesses(data);

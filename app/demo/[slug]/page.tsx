@@ -32,7 +32,7 @@ export default function DemoPage({ params }: { params: Promise<{ slug: string }>
   useEffect(() => {
     const loadBusiness = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/businesses/${slug}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses/${slug}`);
         if (!res.ok) throw new Error('not found');
         const data = await res.json();
         setBusiness(data);
@@ -70,7 +70,7 @@ export default function DemoPage({ params }: { params: Promise<{ slug: string }>
     setIsStreaming(true);
 
     try {
-      const res = await fetch('http://localhost:8000/chat', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -160,7 +160,7 @@ export default function DemoPage({ params }: { params: Promise<{ slug: string }>
       {business.screenshot_path ? (
         <>
           <img
-            src={`http://localhost:8000/${business.screenshot_path.replace(/\\/g, '/')}`}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${business.screenshot_path.replace(/\\/g, '/')}`}
             alt={business.name}
             className="absolute inset-0 h-full w-full object-cover"
             style={{ filter: 'blur(8px)', transform: 'scale(1.1)' }}

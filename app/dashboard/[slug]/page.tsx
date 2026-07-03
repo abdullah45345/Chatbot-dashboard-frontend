@@ -49,7 +49,7 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
   useEffect(() => {
     const loadBusiness = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/businesses/${slug}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses/${slug}`);
         if (!res.ok) {
           if (res.status === 404) {
             setBusiness(null);
@@ -76,7 +76,7 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
 
     setDeleting(true);
     try {
-      const res = await fetch(`http://localhost:8000/businesses/${slug}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses/${slug}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete business');
@@ -89,13 +89,13 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
 
   const copyLink = async () => {
     if (!business) return;
-    const demoUrl = `http://localhost:3000/demo/${business.id}`;
+    const demoUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/demo/${business.id}`;
     await navigator.clipboard.writeText(demoUrl);
   };
 
   const copyEmbedCode = async () => {
     if (!business) return;
-    const embedCode = `<script src="http://localhost:8000/embed.js?id=${business.id}"></script>`;
+    const embedCode = `<script src="${process.env.NEXT_PUBLIC_BACKEND_URL}/embed.js?id=${business.id}"></script>`;
     await navigator.clipboard.writeText(embedCode);
     setCopiedEmbed(true);
     window.setTimeout(() => setCopiedEmbed(false), 2000);
@@ -112,7 +112,7 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
       const formData = new FormData();
       Array.from(selectedFiles).forEach((file) => formData.append('files', file));
 
-      const res = await fetch(`http://localhost:8000/businesses/${slug}/upload-files`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses/${slug}/upload-files`, {
         method: 'POST',
         body: formData,
       });
@@ -220,7 +220,7 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
                   Copy Link
                 </button>
                 <a
-                  href={`http://localhost:3000/demo/${business.id}`}
+                  href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/demo/${business.id}`}
                   target="_blank"
                   rel="noreferrer"
                   className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
@@ -235,7 +235,7 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
             <h2 className="text-lg font-semibold text-gray-900">Embed on Your Website</h2>
             <p className="mt-2 text-sm text-gray-500">Paste this code snippet just before the closing &lt;/body&gt; tag on your website</p>
             <div className="mt-4 overflow-hidden rounded-lg bg-gray-900 p-4">
-              <pre className="overflow-x-auto text-sm text-gray-100"><code>{`<script src="http://localhost:8000/embed.js?id=${business.id}"></script>`}</code></pre>
+              <pre className="overflow-x-auto text-sm text-gray-100"><code>{`<script src="https://chatbot-backend-delta-brown.vercel.app/static/embed.js?id=${business.id}"></script>`}</code></pre>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button
@@ -246,7 +246,6 @@ export default function BusinessManagePage({ params }: { params: Promise<{ slug:
               </button>
               {copiedEmbed ? <span className="text-sm font-medium text-green-600">Copied!</span> : null}
             </div>
-            <p className="mt-3 text-sm text-gray-500">Replace localhost:8000 with your production domain before going live</p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

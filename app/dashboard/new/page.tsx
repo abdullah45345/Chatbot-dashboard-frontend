@@ -74,7 +74,7 @@ export default function NewBusinessPage() {
         formData.append('files', file);
       }
 
-      const res = await fetch('http://localhost:8000/businesses/extract', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses/extract`, {
         method: 'POST',
         body: formData,
       });
@@ -153,7 +153,7 @@ export default function NewBusinessPage() {
         special_offers: stringify(form.special_offers),
       };
 
-      const res = await fetch('http://localhost:8000/businesses', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
