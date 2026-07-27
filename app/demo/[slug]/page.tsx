@@ -154,19 +154,19 @@ export default function DemoPage({ params }: { params: Promise<{ slug: string }>
   }
 
   const accent = business.primary_color || '#2563eb';
+  const screenshotUrl = business.screenshot_path?.startsWith('http') ? business.screenshot_path : null;
+  const logoUrl = business.logo_url?.startsWith('http') ? business.logo_url : null;
 
+
+  console.log("media: ", logoUrl, screenshotUrl );
+  
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gray-950 text-white">
-      {business.screenshot_path ? (
-        <>
-          <img
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${business.screenshot_path.replace(/\\/g, '/')}`}
-            alt={business.name}
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ filter: 'blur(8px)', transform: 'scale(1.1)' }}
-          />
-          <div className="absolute inset-0 bg-black/40" />
-        </>
+    <div
+      className="relative min-h-screen overflow-hidden bg-gray-950 text-white"
+      style={screenshotUrl ? { backgroundImage: `url('${screenshotUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+    >
+      {screenshotUrl ? (
+        <div className="absolute inset-0 bg-black/45" />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700" />
       )}
@@ -174,8 +174,8 @@ export default function DemoPage({ params }: { params: Promise<{ slug: string }>
       <div className="relative z-10 flex min-h-screen flex-col">
         <header className="flex justify-center pt-6 sm:pt-8">
           <div className="rounded-full border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-md">
-            {business.logo_url ? (
-              <img src={business.logo_url} alt={business.name} className="h-12 object-contain" />
+            {logoUrl ? (
+              <img src={logoUrl} alt={business.name} className="h-12 w-auto max-w-[180px] object-contain" />
             ) : (
               <div className="text-lg font-semibold text-white">{business.name}</div>
             )}

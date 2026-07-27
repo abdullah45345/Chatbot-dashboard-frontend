@@ -49,6 +49,8 @@ export default function NewBusinessPage() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>(initialFormState);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState('');
@@ -171,6 +173,32 @@ export default function NewBusinessPage() {
         throw new Error(errorText);
       }
 
+      const createdBusiness = await res.json();
+      if ((logoFile || screenshotFile) && createdBusiness?.id) {
+        const mediaFormData = new FormData();
+        if (logoFile) mediaFormData.append('logo', logoFile);
+        if (screenshotFile) mediaFormData.append('screenshot', screenshotFile);
+        mediaFormData.append('business_id', createdBusiness.id);
+        console.log((logoFile || screenshotFile));
+
+        const mediaRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/businesses/upload-media`, {
+          method: 'POST',
+          body: mediaFormData,
+        });
+
+        if (!mediaRes.ok) {
+          const mediaData = await mediaRes.json().catch(() => ({}));
+          const mediaErrorText = typeof mediaData === 'string'
+            ? mediaData
+            : mediaData?.detail
+              ? (Array.isArray(mediaData.detail)
+                ? mediaData.detail.map((e: unknown) => typeof e === 'object' && e && 'msg' in e ? String(e.msg) : String(e)).join(', ')
+                : mediaData.detail)
+              : mediaData?.message || 'Failed to upload media';
+          throw new Error(mediaErrorText);
+        }
+      }
+
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create business');
@@ -222,7 +250,7 @@ export default function NewBusinessPage() {
                   </div>
                   <div>
                     <p className="text-lg font-semibold text-gray-900">Upload business files</p>
-                    <p className="mt-1 text-sm text-gray-500">PDF, TXT, MD, or DOCX files</p>
+                    <p className="mt-1 text-sm text-gray-500">Optional PDF, TXT, MD, or DOCX files for AI-assisted drafting</p>
                   </div>
                 </label>
                 {selectedFiles.length ? (
@@ -297,6 +325,48 @@ export default function NewBusinessPage() {
                       <option value="funny">funny</option>
                       <option value="formal">formal</option>
                     </select>
+                  </div>
+                  <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 text-center md:col-span-2">
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
+                      className="hidden"
+                    />
+                    <label htmlFor="logo-upload" className="flex cursor-pointer flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-gray-900 p-2 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.9A5 5 0 0117 8a5.5 5.5 0 01.1 11H7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Upload logo</p>
+                        <p className="text-xs text-gray-500">PNG, JPG, SVG, WEBP</p>
+                      </div>
+                    </label>
+                    {logoFile ? <p className="mt-3 text-sm text-gray-600">{logoFile.name}</p> : null}
+                  </div>
+                  <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 text-center md:col-span-2">
+                    <input
+                      id="screenshot-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setScreenshotFile(e.target.files?.[0] ?? null)}
+                      className="hidden"
+                    />
+                    <label htmlFor="screenshot-upload" className="flex cursor-pointer flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-gray-900 p-2 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.9A5 5 0 0117 8a5.5 5.5 0 01.1 11H7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Upload screenshot</p>
+                        <p className="text-xs text-gray-500">PNG, JPG, WEBP</p>
+                      </div>
+                    </label>
+                    {screenshotFile ? <p className="mt-3 text-sm text-gray-600">{screenshotFile.name}</p> : null}
                   </div>
                 </div>
               </section>
